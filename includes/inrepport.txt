@@ -1,0 +1,79 @@
+
+// this function makes us connect to the database (functions.php) using mysqli class
+
+function OpenCon()
+{
+    $dbhost = "localhost";
+    $dbuser = "root";
+    $dbpass = "";
+    $db = "webapp";
+    $conn = new mysqli($dbhost, $dbuser, $dbpass, $db) or die("Connect failed: %s\n" . $conn->error);
+
+    return $conn;
+}
+
+// with this function we can insert data in the table, and that by crypting the message field and hashing the fullname field
+
+
+
+function from_submit()
+{
+    $conn = OpenCon();
+    //i used this to crypt https://www.javatpoint.com/how-to-encrypt-or-decrypt-a-string-in-php#:~:text=In%20the%20PHP%20programming%20language,both%20methods%20of%20PHP%20language.
+    $ciphering_value = "AES-128-CTR";
+    $encryption_key = "Oumaima";
+    $message = openssl_encrypt($_POST['message'], $ciphering_value, $encryption_key);
+    // i used this to hash https://www.php.net/manual/en/function.md5.php
+    $fullname = md5($_POST['fullname']);
+    $sql = "INSERT INTO contacts(fullname, email, phone, message) VALUES ('" . $fullname . "','" . $_POST['email'] . "','" . $_POST['phone'] . "','" . $message . "')";
+    if ($conn->query($sql) === TRUE) {
+        header('Location: /home');
+    } else {
+        header('Location: /about-us');
+    }
+
+    CloseCon($conn);
+}
+
+// this function change the page content depending on the link we clicked
+
+function page_content()
+{
+    $page = isset($_GET['page']) ? $_GET['page'] : 'home';
+    $path = getcwd() . '/' . config('content_path') . '/' . $page . '.phtml';
+
+    if (!file_exists($path)) {
+        $path = getcwd() . '/' . config('content_path') . '/404.phtml';
+    }
+
+    echo file_get_contents($path);
+}
+
+
+// this function cehck if this file is called by a post method then it call the function that store the data 
+
+if (isset($_POST['fullname'])) {
+    from_submit();
+}
+
+we use HTML , CSS and Bootstrap 4 , to build this website 
+
+
+
+<body>
+    <div>
+        <header>
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <div class="container px-5">
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav ms-auto mb-2 mb-lg-0"><?php nav_menu(); ?></ul>// here we build the navbar
+                    </div>
+                </div>
+            </nav>
+        </header>
+        <?php page_content(); ?> // here we call the page content function that return the content depending on the page,
+    </div>
+</body>
+
+
+i think hadchi li kayn 
